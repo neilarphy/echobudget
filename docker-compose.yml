@@ -1,0 +1,47 @@
+version: '3.9'
+
+services:
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: echobudget-app
+    env_file:
+      - app/.env
+    volumes:
+      -./app:/app
+    depends_on:
+      - rabbitmq
+      - database
+
+  web-proxy:
+    image: nginx:latest
+    container_name: echobudget-nginx
+    ports:
+      -"80:80"
+    volumes:
+      -./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: echobudget-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - ./rabbitmq_data:/var/lib/rabbitmq
+    restart: unless-stopped
+
+  database:
+    image: postgres:15
+    container_name: echobudget-postgres
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: echobudget_db
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/database
+    restart: unless-stopped
