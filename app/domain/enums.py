@@ -2,7 +2,7 @@ from enum import Enum
 
 class InputType(Enum):
     VOICE = "voice"
-    Text = "text"
+    TEXT = "text"
 
 class EntryStatus(Enum):
     CREATED = "created"
@@ -21,22 +21,22 @@ class TaskStatus(Enum):
     FAILED = "failed"
 
 class TransactionType(Enum):
-    CREDIT = "пополнение"
-    DEBIT = "списание"
+    CREDIT = "credit"
+    DEBIT = "debit"
 
 class TransactionSource(Enum):
     TOPUP = "topup"
     INFERENCE = "inference"
 
 class TransactionCategory(Enum):
-    FOOD = "еда"
-    TRANSPORT = "транспорт"
-    HEALTH = "здоровье"
-    ENTERTAINMENT = "развлечения"
-    BILLS = "коммуналка"
-    OTHER = "другое"
+    FOOD = "food"
+    TRANSPORT = "transport"
+    HEALTH = "health"
+    ENTERTAINMENT = "entertainment"
+    BILLS = "bills"
+    OTHER = "other"
 
 class MLModelType(Enum):
-    TRANSACTION_CLASSIFIER = "transaction_classifier"
+    ENTRY_CLASSIFIER = "entry_classifier"
     SPEECH_TO_TEXT = "speech_to_text"
 

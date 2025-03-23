@@ -4,13 +4,13 @@ services:
 
   app:
     build:
-      context: .
+      context: ./app
       dockerfile: Dockerfile
     container_name: echobudget-app
     env_file:
-      - app/.env
+      - ./app/.env
     volumes:
-      -./app:/app
+      - ./app:/app
     depends_on:
       - rabbitmq
       - database
@@ -19,9 +19,9 @@ services:
     image: nginx:latest
     container_name: echobudget-nginx
     ports:
-      -"80:80"
+      - "8080:80"
     volumes:
-      -./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - app
 
@@ -34,6 +34,9 @@ services:
     volumes:
       - ./rabbitmq_data:/var/lib/rabbitmq
     restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin
 
   database:
     image: postgres:15

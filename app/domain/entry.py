@@ -35,5 +35,8 @@ class Entry:
     def get_status(self) -> EntryStatus:
         return self.__status
     
-    def get_id(self) -> int:
-        return self.__entry_id
+    def get_input_type(self) -> InputType:
+        return self.__input_type
+    
+    def get_error_reason(self) -> str:
+        return self.__error_reason

@@ -43,3 +43,6 @@ class MLRequestTask:
 
     def get_result(self) -> ParsedEntry:
         return self.__result
+    
+    def get_id(self) -> int:
+        return self.__task_id
