@@ -3,7 +3,13 @@ from app.domain.enums import TransactionType, TransactionSource
 from app.domain.auth import AuthService
 
 class User:
-    def __init__(self, user_id: int, username: str, password_hash: str, role: str = "user"):
+    def __init__(
+            self, 
+            user_id: int, 
+            username: str, 
+            password_hash: str, 
+            role: str = "user"
+        ):
         self.__user_id = user_id
         self.__username = username
         self.__password_hash = password_hash
