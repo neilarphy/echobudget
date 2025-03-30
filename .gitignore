@@ -3,7 +3,3 @@ __pycache__/
 .env
 .log
 .venv/
-
-# Docker volumes
-postgres_data/
-rabbitmq_data/
