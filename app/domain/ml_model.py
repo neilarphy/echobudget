@@ -15,17 +15,17 @@ class MLModel(ABC):
         pass
 
     def get_cost(self) -> int:
-        return self._cost
+        return self.__cost
 
     def get_name(self) -> str:
-        return self._model_name
+        return self.__model_name
     
 
 class EntryClassifier(MLModel):
     def predict(self, text: str) -> dict:
         return {#пример
             "amount": 250.0,
-            "category": "еда",
+            "category": "food",
             "comment": "кофе в Старбаксе"
         }
 

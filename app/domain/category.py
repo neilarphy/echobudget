@@ -26,3 +26,6 @@ class Category:
 
     def get_base_type(self) -> Optional[TransactionCategory]:
         return self.__base_type
+    
+    def get_id(self) -> int:
+        return self.__category_id
