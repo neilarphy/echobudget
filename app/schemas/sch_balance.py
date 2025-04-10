@@ -5,8 +5,8 @@ class BalanceUpdateRequest(BaseModel):
     amount: int = Field(..., gt=0, example=100)
     source: TransactionSource = Field(..., example=TransactionSource.TOPUP)
 
-    class Config:
-        use_enum_values = True
+    # class Config:
+    #     use_enum_values = True
 
 class BalanceResponse(BaseModel):
     balance: int = Field(..., example=500)

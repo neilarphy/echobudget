@@ -2,6 +2,10 @@ from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
 from app.infra.database.base import Base
 from app.domain.enums import UserRole
+from app.infra.database.models.category import CategoryORM
+from app.infra.database.models.entries import EntryORM
+from app.infra.database.models.parsed_entry import ParsedEntryORM
+from app.infra.database.models.transactionlog import TransactionLogORM
 
 class UserORM(Base):
     __tablename__ = "users"

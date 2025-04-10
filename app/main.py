@@ -1,7 +1,14 @@
 from fastapi import FastAPI
+from contextlib import asynccontextmanager
 from app.infra.api.router import router as api_router
+from app.infra.database.init_db import create_tables
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    create_tables()
+    yield
+
+app = FastAPI(title="EchoBudget", lifespan=lifespan)
 
 app.include_router(api_router)
 

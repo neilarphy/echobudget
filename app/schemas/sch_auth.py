@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field, EmailStr
 
 class RegisterRequest(BaseModel):
     username: str = Field(..., example="иваниванов")
-    email: EmailStr = Field(..., example="иваниванов@example")
+    email: EmailStr = Field(..., example="иваниванов@test.com")
     password: str = Field(..., min_length=6, example="securepassword")
 
 class LoginRequest(BaseModel):

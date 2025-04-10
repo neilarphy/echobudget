@@ -5,7 +5,7 @@ from app.schemas.sch_auth import (
     AuthResponse,
 )
 from app.domain.auth import AuthService
-from app.infra.database.session import SessionLocal
+from app.infra.database.session import get_db
 from app.infra.database.crud.user_crud import (
      create_user, 
      get_user_by_username,
@@ -15,7 +15,7 @@ router = APIRouter()
 
 @router.post("/register", response_model=AuthResponse)
 def register_user(data: RegisterRequest):
-    db = SessionLocal()
+    db = next(get_db())
     try:
         existing_user = get_user_by_username(db, data.username)
         if existing_user:
@@ -41,16 +41,16 @@ def register_user(data: RegisterRequest):
 
 @router.post("/login", response_model=AuthResponse)
 def login_user(data: LoginRequest):
-    db = SessionLocal()
+    db = next(get_db())
     try:
         user = get_user_by_username(db, data.username)
-        if not user or not AuthService.verify_password(data.password):
+        if not user or not AuthService.verify_password(data.password, user.password_hash):
             raise HTTPException(status_code=401, detail="Неверный пароль или юзера не существует")
         
         return AuthResponse(
             id=user.id,
             username=user.username,
-            emai=user.email,
+            email=user.email,
             token="mock-token"
         )
 
