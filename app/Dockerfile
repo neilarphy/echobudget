@@ -1,8 +1,13 @@
 FROM python:3.11-slim
 
-WORKDIR /app
+WORKDIR /code
 
-COPY . /app/
+# COPY . /app/
+COPY . /code/app
+COPY requirements.txt /code/
+
 RUN pip install --no-cache-dir -r requirements.txt
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+ENV ENV PYTHONPATH=/code
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
