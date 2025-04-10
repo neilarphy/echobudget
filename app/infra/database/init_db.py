@@ -8,7 +8,6 @@ from app.domain.enums import (
     EntryStatus,
     )
 from app.infra.database.crud.user_crud import create_user, get_user_by_username
-from app.infra.database.crud.transactionlogs_crud import create_transaction_log
 from app.infra.database.crud.category_crud import create_category
 from app.infra.database.crud.entriy_crud import create_entry
 from app.infra.database.crud.parsedentry_crud import create_parsed_entry
@@ -46,21 +45,6 @@ def seed_demo_data():
         else:
             admin = get_user_by_username(session, "admin")
 
-        # create_transaction_log(
-        #     db=session,
-        #     user_id=user.id,
-        #     amount=100,
-        #     type_=TransactionType.CREDIT,
-        #     source=TransactionSource.TOPUP
-        # )
-
-        # create_transaction_log(
-        #     db=session,
-        #     user_id=admin.id,
-        #     amount=999,
-        #     type_=TransactionType.CREDIT,
-        #     source=TransactionSource.TOPUP
-        # )
         user_bm = BalanceManagerORM(db=session, user=user)
         user_bm.add_balance(amount=100)
 

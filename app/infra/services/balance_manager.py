@@ -1,5 +1,3 @@
-# app/infra/services/balance_manager.py
-
 from app.infra.database.models.users import UserORM
 from app.infra.database.models.transactionlog import TransactionLogORM
 from app.domain.enums import TransactionType, TransactionSource
