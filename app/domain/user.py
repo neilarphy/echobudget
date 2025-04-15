@@ -24,6 +24,9 @@ class User:
     def get_username(self) -> str:
         return self.__username
     
+    def get_user_id(self) -> int:
+        return self.__user_id
+    
     def get_email(self) -> str:
         return self.__email
     

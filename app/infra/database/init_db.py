@@ -9,7 +9,7 @@ from app.domain.enums import (
     )
 from app.infra.database.crud.user_crud import create_user, get_user_by_username
 from app.infra.database.crud.category_crud import create_category
-from app.infra.database.crud.entriy_crud import create_entry
+from app.infra.database.crud.entry_crud import create_entry
 from app.infra.database.crud.parsedentry_crud import create_parsed_entry
 from app.infra.services.balance_manager import BalanceManagerORM
 from app.domain.auth import AuthService
@@ -70,7 +70,7 @@ def seed_demo_data():
             amount=300.0,
             category="food",
             comment="обед",
-            model_name="baseline-text"
+            model_name="entry_classifier"
         )
 
         session.commit()

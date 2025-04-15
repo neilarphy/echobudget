@@ -16,7 +16,7 @@ from app.domain.enums import TransactionSource
 router = APIRouter()
 
 
-# Мок-пользователь, пока нет настоящей авторизации
+# Мок-пользователь
 def get_mock_user(
         db: Session = Depends(get_db)
 ):
