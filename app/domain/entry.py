@@ -26,6 +26,9 @@ class Entry:
         self.__status = EntryStatus.FAULTED
         self.__error_reason = reason
 
+    def get_entry_id(self) -> int:
+        return self.__entry_id
+
     def get_data(self) -> str:
         return self.__data
     

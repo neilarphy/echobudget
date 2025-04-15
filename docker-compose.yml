@@ -21,7 +21,6 @@ services:
     ports:
       - "8080:80"
       - "443:443"
-
     volumes:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
     depends_on:
@@ -41,6 +40,39 @@ services:
     volumes:
       - rabbitmq_volume:/var/lib/rabbitmq
     restart: on-failure
+    healthcheck:
+      test: [ "CMD", "rabbitmqctl", "status" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  ml_worker1:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: echobudget-ml-worker-001
+    command: [ "python", "app/infra/workers/worker_main.py" ]
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      database:
+        condition: service_started
+    env_file:
+      - ./.env
+
+  ml_worker2:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: echobudget-ml-worker-002
+    command: [ "python", "app/infra/workers/worker_main.py" ]
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      database:
+        condition: service_started
+    env_file:
+      - ./.env
 
   database:
     image: postgres:17
@@ -57,6 +89,23 @@ services:
       - postgres_volume:/var/lib/postgresql/data
     restart: on-failure
 
+  s3_storage:
+    image: minio/minio:RELEASE.2025-04-08T15-41-24Z
+    container_name: echobudget-minio-s3
+    command: [ "server", "/data", "--console-address", ":9001" ]
+    env_file:
+      - ./.env
+    ports:
+      - "9000:9000" #api
+      - "9001:9001" #web
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    volumes:
+      - minio_s3_volume:/data
+    restart: on-failure
+
 volumes:
   postgres_volume:
   rabbitmq_volume:
+  minio_s3_volume:

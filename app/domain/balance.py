@@ -1,9 +1,9 @@
-from app.domain.transaction_log import TransactionLog
 from app.domain.enums import TransactionType, TransactionSource
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Union
 
 if TYPE_CHECKING:
     from app.domain.user import User
+    from app.domain.transaction_log import TransactionLog
 
 class BalanceManager:
     def __init__(
@@ -13,7 +13,7 @@ class BalanceManager:
     ):
         self.__owner = owner
         self.__balance = initial_balance
-        self.__history: list[TransactionLog] = []
+        self.__history: list["TransactionLog"] = []
 
     def get_balance(self):
         return self.__balance
@@ -22,7 +22,7 @@ class BalanceManager:
             self,
             amount:int,
             source: TransactionSource = TransactionSource.TOPUP 
-    ) -> TransactionLog:
+    ) -> "TransactionLog":
         self.__balance += amount
         log = TransactionLog(
             log_id=0,
@@ -38,7 +38,7 @@ class BalanceManager:
             self,
             amount: int,
             source: TransactionSource = TransactionSource.INFERENCE
-    ) -> tuple[bool, TransactionLog | None]:
+    ) -> tuple[bool, Union["TransactionLog" , None]]:
         if self.__balance >= amount:
             self.__balance -= amount
             log =TransactionLog(

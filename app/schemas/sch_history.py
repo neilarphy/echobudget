@@ -9,8 +9,7 @@ class EntryOut(BaseModel):
     data: str
     status: str
 
-    class Config:
-        orm_mode = True
+    model_config = dict(from_attributes=True)
 
 
 class ParsedEntryOut(BaseModel):
@@ -23,17 +22,12 @@ class ParsedEntryOut(BaseModel):
     model_name: str
     created_at: Optional[datetime]
 
-    class Config:
-        orm_mode = True
+    model_config = dict(from_attributes=True)
 
 
 class PredictionHistoryItem(BaseModel):
     entry: EntryOut
-    parsed: ParsedEntryOut
-
-    class Config:
-        orm_mode = True
-
+    parsed: Optional[ParsedEntryOut] = None
 
 class PredictionHistoryResponse(BaseModel):
     history: list[PredictionHistoryItem]
