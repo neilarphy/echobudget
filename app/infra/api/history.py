@@ -6,6 +6,9 @@ from app.infra.database.crud.user_crud import get_user_by_username
 from app.infra.database.crud.entry_crud import get_entries_by_user, get_entry
 from app.infra.database.crud.parsedentry_crud import get_parsed_entries_by_user, get_parsed_entry_by_entry_id
 from app.schemas.sch_history import PredictionHistoryResponse, PredictionHistoryItem
+from app.utils.logger import get_logger
+
+logger = get_logger(__name__)
 
 router = APIRouter()
 
@@ -27,7 +30,12 @@ def get_prediction_history(
     history = []
 
     for entry in entries:
-        parsed =get_parsed_entry_by_entry_id(db, entry.id)
+        try:
+            parsed =get_parsed_entry_by_entry_id(db, entry.id)
+        except Exception as e:
+            logger.error(f"Ошибка при получении parsed для entry {entry.id}: {e}")
+            parsed = None
+        
         history.append(
             PredictionHistoryItem(
                 entry=entry,

@@ -30,6 +30,9 @@ def get_user_by_id(db: Session, user_id: int) -> UserORM | None:
 def get_user_by_username(db: Session, username: str) -> UserORM | None:
     return db.query(UserORM).filter_by(username=username).first()
 
+def get_user_by_email(db: Session, email: str):
+    return db.query(UserORM).filter_by(email=email).first()
+
 
 def list_users(db: Session) -> list[UserORM]:
     return db.query(UserORM).all()

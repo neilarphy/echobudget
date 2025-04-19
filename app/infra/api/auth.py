@@ -9,6 +9,7 @@ from app.infra.database.session import get_db
 from app.infra.database.crud.user_crud import (
      create_user, 
      get_user_by_username,
+     get_user_by_email,
 )
 
 router = APIRouter()
@@ -43,7 +44,7 @@ def register_user(data: RegisterRequest):
 def login_user(data: LoginRequest):
     db = next(get_db())
     try:
-        user = get_user_by_username(db, data.username)
+        user = get_user_by_email(db, data.email)
         if not user or not AuthService.verify_password(data.password, user.password_hash):
             raise HTTPException(status_code=401, detail="Неверный пароль или юзера не существует")
         
