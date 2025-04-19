@@ -23,20 +23,73 @@
         </div>
     </section>
 </template>
+<!-- 
+<script setup>
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import axios from 'axios'
+import { ElMessage } from 'element-plus'
+
+const router = useRouter()
+
+const form = ref({
+  email: '',
+  password: ''
+})
+
+async function login() {
+  try {
+    const res = await axios.post('/api/auth/login', {
+      email: form.value.email,
+      password: form.value.password
+    })
+
+    localStorage.setItem('token', res.data.token)
+    localStorage.setItem('username', res.data.username)
+
+    ElMessage.success('Успешный вход')
+    router.push('/dashboard')
+  } catch (err) {
+    ElMessage.error(err.response?.data?.detail || 'Ошибка входа')
+  }
+}
+</script> -->
 
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import axios from 'axios'
+import { ElMessage } from 'element-plus'
+import { useAuthStore } from '@/stores/authStore'
+
+const router = useRouter()
+const authStore = useAuthStore()
 
 const form = ref({
-    email: '',
-    password: ''
+  email: '',
+  password: ''
 })
 
-function login() {
-    // TODO: логика логина
-    console.log(form.value)
+async function login() {
+  try {
+    const res = await axios.post('/api/auth/login', {
+      email: form.value.email,
+      password: form.value.password
+    })
+
+    authStore.setAuth({
+      token: res.data.token,
+      username: res.data.username
+    })
+
+    ElMessage.success('Успешный вход')
+    router.push('/dashboard')
+  } catch (err) {
+    ElMessage.error(err.response?.data?.detail || 'Ошибка входа')
+  }
 }
 </script>
+
 
 <style scoped>
 .auth-page {

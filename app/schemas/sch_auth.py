@@ -6,7 +6,7 @@ class RegisterRequest(BaseModel):
     password: str = Field(..., min_length=6, example="securepassword")
 
 class LoginRequest(BaseModel):
-    username: str = Field(..., example="иваниванов")
+    email: str = Field(..., example="иваниванов@test.com")
     password: str = Field(..., example="securepassword")
 
 

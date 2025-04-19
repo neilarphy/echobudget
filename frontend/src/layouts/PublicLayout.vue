@@ -1,18 +1,16 @@
 <template>
     <div>
-      <header class="header">
-        <div class="logo">EchoBudget</div>
-        <nav class="nav">
-          <RouterLink to="/">Главная</RouterLink>
-          <RouterLink to="/login">Вход</RouterLink>
-          <RouterLink to="/register">Регистрация</RouterLink>
-        </nav>
-      </header>
+      <PublicHeader />
       <main>
         <RouterView />
       </main>
     </div>
   </template>
+  
+  <script setup>
+  import { RouterView } from 'vue-router'
+  import PublicHeader from '@/components/PublicHeader.vue'
+  </script>
   
   <style scoped>
   .header {
@@ -33,6 +31,7 @@
   .nav a {
     margin-left: 1rem;
     color: #ccc;
+    text-decoration: none;
   }
   
   .nav a.router-link-exact-active {

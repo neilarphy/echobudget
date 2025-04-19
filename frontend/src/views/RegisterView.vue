@@ -34,19 +34,48 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import axios from 'axios'
+import { ElMessage } from 'element-plus'
+import { useAuthStore } from '@/stores/authStore'
+
+const router = useRouter()
+const authStore = useAuthStore()
 
 const form = ref({
-    username: '',
-    email: '',
-    password: '',
-    confirm: ''
+  username: '',
+  email: '',
+  password: '',
+  confirm: ''
 })
 
-function register() {
-    // TODO: логика регистрации
-    console.log('Регистрация:', form.value)
+async function register() {
+  if (form.value.password !== form.value.confirm) {
+    ElMessage.error('Пароли не совпадают')
+    return
+  }
+
+  try {
+    const res = await axios.post('/api/auth/register', {
+      username: form.value.username,
+      email: form.value.email,
+      password: form.value.password
+    })
+
+    authStore.setAuth({
+      token: res.data.token,
+      username: res.data.username
+    })
+
+    ElMessage.success('Регистрация прошла успешно')
+    router.push('/dashboard')
+  } catch (err) {
+    ElMessage.error(err.response?.data?.detail || 'Ошибка регистрации')
+  }
 }
 </script>
+
+
 
 <style scoped>
 .auth-page {

@@ -1,205 +1,295 @@
 <template>
     <section class="dashboard">
-        <h1 class="greeting">Добро пожаловать, Иван!</h1>
+      <h1 class="greeting">👋 Добро пожаловать, {{ userName }}!</h1>
 
-        <div class="grid">
-            <!-- Блок голосового ввода -->
-            <div class="card full">
-                <h2>Ввод транзакции голосом</h2>
-                <p class="description">Нажмите на микрофон, чтобы добавить транзакцию</p>
-                <button class="voice-button" @click="toggleRecording" :class="{ recording: isRecording }">
-                    <i v-if="!isRecording" class="el-icon-microphone" />
-                    <i v-else class="el-icon-video-pause" />
-                </button>
-                <p v-if="audioBlob" class="recorded-label">🎧 Запись готова</p>
+      <div class="grid">
+        <!-- 🎙 Ввод транзакции: голос и текст -->
+        <div class="card span-3 input-card">
+          <h2><el-icon><Mic /></el-icon> Ввод транзакции</h2>
+          <p class="description">Выберите способ: голос или текст</p>
+  
+          <div class="input-columns">
+            <!-- 🎙 Голос -->
+            <div class="input-block voice">
+              <h4>🎙 Голосом</h4>
+              <button class="voice-button" @click="toggleRecording" :class="{ recording: isRecording }">
+                <el-icon v-if="!isRecording"><Mic /></el-icon>
+                <el-icon v-else><VideoPause /></el-icon>
+              </button>
+              <p v-if="audioBlob" class="recorded-label">🎧 Запись готова</p>
             </div>
-
-            <!-- Последние транзакции -->
-            <div class="card">
-                <h3>Последние транзакции</h3>
-                <ul class="transaction-list">
-                    <li><span>Amazon</span><span class="minus">-150$</span></li>
-                    <li><span>Salary</span><span class="plus">+2500$</span></li>
-                    <li><span>Groceries</span><span class="minus">-75$</span></li>
-                </ul>
+  
+            <!-- ⌨️ Текст -->
+            <div class="input-block text">
+              <h4>⌨️ Вручную</h4>
+              <el-input v-model="manualText" placeholder="Например: Купил кофе за 250₽" />
+              <el-button type="primary" class="send-button" @click="sendText">Отправить</el-button>
             </div>
-
-            <!-- Советы от ИИ -->
-            <div class="card">
-                <h3>Советы от ИИ</h3>
-                <ul class="ai-tips">
-                    <li>📌 Используйте депозиты для ускорения целей</li>
-                    <li>📌 Проверяйте подписки</li>
-                    <li>📌 Оптимизируйте расходы через планировщик</li>
-                </ul>
-            </div>
-
-            <!-- Финансовая игра -->
-            <div class="card wide green">
-                <h3>Финансовая игра</h3>
-                <div class="game-grid">
-                    <div class="game-card">Инвестор 💹</div>
-                    <div class="game-card">Бюджетный челлендж 🧮</div>
-                    <div class="game-card">Финансовая викторина ❓</div>
-                </div>
-                <el-button type="danger" round style="margin-top: 1rem">
-                    Играть
-                </el-button>
-            </div>
+          </div>
         </div>
+  
+        <!-- Последние транзакции -->
+        <div class="card last-transactions span-2">
+          <h3><el-icon><ShoppingCart /></el-icon> Последние транзакции</h3>
+          <ul class="transaction-list">
+            <li><span>Amazon</span><span class="minus">-150$</span></li>
+            <li><span>Salary</span><span class="plus">+2500$</span></li>
+            <li><span>Groceries</span><span class="minus">-75$</span></li>
+          </ul>
+        </div>
+  
+        <!-- Советы от ИИ -->
+        <div class="card ai">
+          <h3><el-icon><MagicStick /></el-icon> Советы от ИИ</h3>
+          <ul class="ai-tips">
+            <li>✅ Используйте депозиты для целей</li>
+            <li>✅ Проверяйте подписки</li>
+            <li>✅ Оптимизируйте расходы через планировщик</li>
+          </ul>
+        </div>
+  
+        <!-- Финансовая игра -->
+        <div class="card game span-3">
+          <h3>🎮 Финансовая игра</h3>
+          <div class="game-grid">
+            <div class="game-card investor">🏠 Инвестор</div>
+            <div class="game-card challenge">📋 Челлендж</div>
+            <div class="game-card quiz">❓ Викторина</div>
+          </div>
+          <el-button type="danger" round class="play-button">Играть</el-button>
+        </div>
+      </div>
     </section>
-</template>
+  </template>
+  
+  <script setup>
+  import { ref, computed, inject } from 'vue'
+  import RecordRTC from 'recordrtc'
+  import { ElMessage } from 'element-plus'
+  import { Mic, VideoPause, ShoppingCart, MagicStick } from '@element-plus/icons-vue'
+  import axios from 'axios'
+  import { useAuthStore } from '@/stores/authStore'
+  const auth = useAuthStore()
 
-<script setup>
-import { ref } from 'vue'
-import RecordRTC from 'recordrtc'
-import { ElMessage } from 'element-plus'
+  const userName = computed(() => auth.username || 'Гость')
 
-const isRecording = ref(false)
-const audioBlob = ref(null)
-
-let recorder = null
-let stream = null
-
-function toggleRecording() {
+  const balance = inject('balance')
+  const loadBalance = inject('loadBalance')
+  
+  const isRecording = ref(false)
+  const audioBlob = ref(null)
+  const manualText = ref('')
+  
+  let recorder = null
+  let stream = null
+  
+  function toggleRecording() {
     isRecording.value ? stopRecording() : startRecording()
-}
-
-function startRecording() {
+  }
+  
+  function startRecording() {
     isRecording.value = true
-    navigator.mediaDevices.getUserMedia({ audio: true }).then((_stream) => {
+    navigator.mediaDevices.getUserMedia({ audio: true })
+      .then((_stream) => {
         stream = _stream
         recorder = new RecordRTC(stream, {
-            type: 'audio',
-            mimeType: 'audio/wav'
+          type: 'audio',
+          mimeType: 'audio/wav'
         })
         recorder.startRecording()
-    }).catch(() => {
+      })
+      .catch(() => {
         ElMessage.error('Ошибка доступа к микрофону')
         isRecording.value = false
-    })
-}
-
-function stopRecording() {
+      })
+  }
+  
+  function stopRecording() {
     recorder.stopRecording(() => {
-        audioBlob.value = recorder.getBlob()
-        isRecording.value = false
-        recorder = null
-        stream?.getTracks().forEach((t) => t.stop())
-        stream = null
-        ElMessage.success('Запись завершена')
+      audioBlob.value = recorder.getBlob()
+      isRecording.value = false
+      recorder = null
+      stream?.getTracks().forEach((t) => t.stop())
+      stream = null
+      sendVoice(audioBlob.value)
     })
-}
-</script>
-
-<style scoped>
-.dashboard {
+  }
+  
+  async function pollBalanceUntilChanged(timeoutMs = 10000, intervalMs = 1000) {
+    const startBalance = balance.value
+    const startedAt = Date.now()
+  
+    while (Date.now() - startedAt < timeoutMs) {
+      await loadBalance()
+      if (balance.value !== startBalance) {
+        console.log(' Баланс обновился:', balance.value)
+        return
+      }
+      await new Promise(resolve => setTimeout(resolve, intervalMs))
+    }
+  
+    console.warn(' Баланс не обновился в течение таймаута')
+  }
+  
+  async function sendVoice(blob) {
+    try {
+      const formData = new FormData()
+      formData.append('model_type', 'speech_to_text')
+      formData.append('file', blob, 'voice.wav')
+  
+      await axios.post('/api/entry/', formData)
+      ElMessage.success('Голосовая транзакция отправлена!')
+      await pollBalanceUntilChanged()
+    } catch (err) {
+      ElMessage.error('Ошибка при отправке голоса')
+      console.error('Voice error:', err)
+    }
+  }
+  
+  async function sendText() {
+    if (!manualText.value.trim()) {
+      ElMessage.warning('Введите текст транзакции')
+      return
+    }
+  
+    try {
+      const formData = new FormData()
+      formData.append('model_type', 'entry_classifier')
+      formData.append('text', manualText.value)
+  
+      await axios.post('/api/entry/', formData)
+      ElMessage.success('Текстовая транзакция отправлена!')
+      manualText.value = ''
+      await pollBalanceUntilChanged()
+    } catch (err) {
+      ElMessage.error('Ошибка при отправке текста')
+      console.error('Text error:', err)
+    }
+  }
+  </script>
+  
+  <style scoped>
+  .dashboard {
     padding: 2rem;
-    max-width: 1200px;
+    max-width: 1400px;
     margin: auto;
     color: white;
-}
-
-.greeting {
-    font-size: 2rem;
+  }
+  .greeting {
+    font-size: 2.4rem;
     font-weight: bold;
-    margin-bottom: 2rem;
     text-align: center;
-}
-
-.grid {
+    margin-bottom: 2.5rem;
+  }
+  .grid {
     display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: 2rem;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-}
-
-.card {
+  }
+  .card {
     background: #1a1a1a;
-    padding: 1.5rem;
-    border-radius: 12px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-}
-
-.card.full {
-    grid-column: span 2;
+    border-radius: 14px;
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.4);
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     text-align: center;
-}
-
-.card.wide {
-    grid-column: span 3;
-}
-
-.card.green {
-    background: #1e3622;
-}
-
-.voice-button {
-    margin-top: 1rem;
+  }
+  .card.ai {
+    align-items: flex-start;
+    text-align: left;
+  }
+  .span-2 { grid-column: span 2; }
+  .span-3 { grid-column: span 3; }
+  
+  .input-columns {
+    display: flex;
+    gap: 2rem;
+    width: 100%;
+    margin-top: 1.5rem;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+  .input-block {
+    flex: 1 1 45%;
+    background: #141414;
+    border-radius: 12px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+  .input-block.text :deep(.el-input) {
+    width: 100%;
+  }
+  .input-block.text .send-button {
+    align-self: flex-end;
+  }
+  .input-block h4 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 500;
+  }
+  .voice-button {
     background: #409eff;
-    width: 64px;
-    height: 64px;
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
     border: none;
-    font-size: 1.5rem;
+    font-size: 2rem;
     color: white;
     transition: background 0.3s;
-}
-
-.voice-button.recording {
+    box-shadow: 0 0 10px rgba(0, 128, 255, 0.5);
+  }
+  .voice-button.recording {
     background: red;
-}
-
-.recorded-label {
-    margin-top: 1rem;
-    color: #8ff58f;
-}
-
-.transaction-list {
-    margin: 1rem 0;
+    animation: pulse 1.5s infinite;
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.5); }
+    70% { box-shadow: 0 0 0 16px rgba(255, 0, 0, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); }
+  }
+  .transaction-list {
     list-style: none;
     padding: 0;
-}
-
-.transaction-list li {
+    margin-top: 1rem;
+  }
+  .transaction-list li {
     display: flex;
     justify-content: space-between;
-    padding: 0.4rem 0;
+    padding: 0.6rem 0;
     border-bottom: 1px solid #333;
-}
-
-.plus {
-    color: #5aff5a;
-}
-
-.minus {
-    color: #ff5a5a;
-}
-
-.ai-tips {
-    list-style: none;
-    padding: 0;
-    margin: 1rem 0 0;
-}
-
-.ai-tips li {
-    margin-bottom: 0.5rem;
-    font-size: 0.95rem;
-    line-height: 1.4;
-}
-
-.game-grid {
+    gap: 0.5rem;
+    align-items: center;
+  }
+  .plus { color: #3cff84; }
+  .minus { color: #ff4d4d; }
+  .ai-tips {
+    margin-top: 1rem;
+    padding-left: 1.2rem;
+    list-style: disc;
+  }
+  .game-grid {
     display: flex;
     gap: 1rem;
     margin-top: 1rem;
-}
-
-.game-card {
-    flex: 1;
-    background: #2f5732;
-    padding: 1rem;
-    border-radius: 8px;
+    flex-wrap: wrap;
+  }
+  .game-card {
+    flex: 1 1 30%;
+    border-radius: 10px;
     text-align: center;
-    color: #d7ffd7;
     font-weight: 500;
-}
-</style>
+    padding: 1rem;
+    color: white;
+  }
+  .investor { background: #2e6032; }
+  .challenge { background: #325060; }
+  .quiz { background: #60324e; }
+  .play-button {
+    margin-top: 1rem;
+  }
+  </style>
